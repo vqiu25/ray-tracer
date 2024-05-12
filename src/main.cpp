@@ -59,9 +59,9 @@ int main() {
       int ig = int(255.999 * col.y());
       int ib = int(255.999 * col.z());
 
-      std::cout << ir << ' ' << ig << ' ' << ib << '\n';
+      // std::cout << ir << ' ' << ig << ' ' << ib << '\n';
       sdltemplate::setDrawColor(sdltemplate::createColor(ir, ig, ib, 255));
-      sdltemplate::drawPoint(i, j);
+      sdltemplate::drawPoint(i, image_height - j);
     }
   }
 
