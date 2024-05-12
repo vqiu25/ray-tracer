@@ -4,8 +4,18 @@
 #include <iostream>
 
 vec3 colour(const ray& r) {
+  // Converts the ray/vector into a unit vector
   vec3 unitDir = unit_vector(r.direction());
+  // t is a value between 0 and 1, where 0 corresponds to a ray poitning
+  // downward, and 1 being upward
   double t = 0.5 * (unitDir.y() + 1.0);
+  /*
+   * 1.0, 1.0, 1.0 is white
+   * 0.5, 0.7, 1.0 is blue
+   *
+   * Hence, as we multiple white by (1.0 - t), upwards will be blue, downwards
+   * will be white
+   */
   return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
 }
 
@@ -39,10 +49,12 @@ int main() {
     for (int i = 0; i < image_width; i++) {
       double u = double(i) / double(image_width);
       double v = double(j) / double(image_height);
+
+      // Identify where to project ray to draw
       ray r = ray(origin, lowerLeftCorner + u * horizontal + v * vertical);
-      // vec3 col(double(i) / (image_width - 1), double(j) / (image_height - 1),
-      //  0.0);
+      // Set the colour of where the ray is pointing
       vec3 col = colour(r);
+
       int ir = int(255.999 * col.x());
       int ig = int(255.999 * col.y());
       int ib = int(255.999 * col.z());
