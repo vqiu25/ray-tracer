@@ -3,7 +3,22 @@
 #include "vec3.h"
 #include <iostream>
 
+bool hit_sphere(const vec3 centre, double radius, const ray& r) {
+  vec3 oc = r.origin() - centre;
+  double a = dot(r.direction(), r.direction());
+  double b = 2.0 * dot(oc, r.direction());
+  double c = dot(oc, oc) - radius * radius;
+  float discrimant = b * b - 4 * a * c;
+  return (discrimant > 0);
+}
+
+vec3 sphere;
+double sphere_radius;
+
 vec3 colour(const ray& r) {
+  if (hit_sphere(sphere, sphere_radius, r)) {
+    return vec3(1, 1, 1);
+  }
   // Converts the ray/vector into a unit vector
   vec3 unitDir = unit_vector(r.direction());
   // t is a value between 0 and 1, where 0 corresponds to a ray poitning
@@ -40,6 +55,10 @@ int main() {
   vec3 horizontal = vec3(4.0, 0.0, 0.0);
   vec3 vertical = vec3(0.0, 2.0, 0.0);
   vec3 origin = vec3(0.0, 0.0, 0.0);
+
+  // Create a Sphere
+  sphere = vec3(0, 0, -1);
+  sphere_radius = 0.5;
 
   std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
   sdltemplate::sdl("Ray Tracer", image_width, image_height);
