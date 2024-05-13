@@ -3,27 +3,36 @@
 #include "vec3.h"
 #include <iostream>
 
-bool hit_sphere(const vec3 centre, double radius, const ray& r) {
+double hit_sphere(const vec3 centre, double radius, const ray& r) {
   vec3 oc = r.origin() - centre;
   double a = dot(r.direction(), r.direction());
   double b = 2.0 * dot(oc, r.direction());
   double c = dot(oc, oc) - radius * radius;
   float discrimant = b * b - 4 * a * c;
-  return (discrimant > 0);
+  if (discrimant < 0) {
+    return -1;
+  } else {
+    return (-b - sqrt(discrimant)) / (2.0 * a);
+  }
 }
 
 vec3 sphere;
 double sphere_radius;
 
 vec3 colour(const ray& r) {
-  if (hit_sphere(sphere, sphere_radius, r)) {
-    return vec3(1, 1, 1);
+  double t = hit_sphere(sphere, sphere_radius, r);
+  if (t > 0.0) {
+    // Now if the ray hits the sphere, we will compute the normalised vector
+    // from the sphere's centre to hit the point on the sphere's surface
+    vec3 N = unit_vector(r.at(t) - vec3(0, 0, -1));
+    return 0.5 * vec3(N.x() + 1, N.y() + 1, N.z() + 1);
   }
+
   // Converts the ray/vector into a unit vector
   vec3 unitDir = unit_vector(r.direction());
   // t is a value between 0 and 1, where 0 corresponds to a ray poitning
   // downward, and 1 being upward
-  double t = 0.5 * (unitDir.y() + 1.0);
+  t = 0.5 * (unitDir.y() + 1.0);
   /*
    * 1.0, 1.0, 1.0 is white
    * 0.5, 0.7, 1.0 is blue
