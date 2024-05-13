@@ -4,12 +4,35 @@
 #include "vec3.h"
 #include <chrono>
 #include <iostream>
+#include <thread>
+
+void renderSegment(int startY, int endY, int imageWidth, int imageHeight,
+                   const vec3& lowerLeftCorner, const vec3& horizontal,
+                   const vec3& vertical, const vec3& origin,
+                   const vec3& sphereCentre, double sphere_radius) {
+  for (int j = startY; j < endY; j++) {
+    for (int i = 0; i < imageWidth; i++) {
+      double u = double(i) / double(imageWidth);
+      double v = double(j) / double(imageHeight);
+      ray r(origin, lowerLeftCorner + u * horizontal + v * vertical);
+      vec3 col = colour(r, sphereCentre, sphere_radius);
+      int ir = int(255.999 * col.x());
+      int ig = int(255.999 * col.y());
+      int ib = int(255.999 * col.z());
+
+      sdltemplate::setDrawColor(sdltemplate::createColor(ir, ig, ib, 255));
+      sdltemplate::drawPoint(i, imageHeight - j);
+    }
+  }
+}
 
 int main() {
 
   // 4:2 Aspect Ratio
   int imageWidth = 800;
   int imageHeight = 400;
+  int numThreads = std::thread::hardware_concurrency();
+  std::vector<std::thread> threads;
 
   // Print to terminal
   std::cout << "Format: P3 (colors in ASCII)\n";
@@ -40,19 +63,20 @@ int main() {
   // Start timer
   auto start = std::chrono::high_resolution_clock::now();
 
-  for (int j = 0; j < imageHeight; j++) {
-    for (int i = 0; i < imageWidth; i++) {
-      double u = double(i) / double(imageWidth);
-      double v = double(j) / double(imageHeight);
-      ray r(origin, lowerLeftCorner + u * horizontal + v * vertical);
-      vec3 col = colour(r, sphereCentre, sphere_radius);
-      int ir = int(255.999 * col.x());
-      int ig = int(255.999 * col.y());
-      int ib = int(255.999 * col.z());
+  // Divide portions of the image by the number of threads to "distribute" the
+  // workload
+  int segmentHeight = imageHeight / numThreads;
+  for (int t = 0; t < numThreads; t++) {
+    int startY = t * segmentHeight;
+    int endY = (t == numThreads - 1) ? imageHeight : (t + 1) * segmentHeight;
+    threads.push_back(std::thread(
+        renderSegment, startY, endY, imageWidth, imageHeight, lowerLeftCorner,
+        horizontal, vertical, origin, sphereCentre, sphere_radius));
+  }
 
-      sdltemplate::setDrawColor(sdltemplate::createColor(ir, ig, ib, 255));
-      sdltemplate::drawPoint(i, imageHeight - j);
-    }
+  // Wait for all rendering threads to complete before proceeding
+  for (auto& t : threads) {
+    t.join();
   }
 
   // Stop timer
