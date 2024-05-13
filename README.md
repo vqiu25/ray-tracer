@@ -7,7 +7,7 @@
 ## About
 A simplistic ray tracing engine, built with the guidance of Peter Shirley's "Ray Tracing in One Weekend" book. This is a rudimentary implementation that incorporates only spheres. However, this version utilises multithreading and a GUI, which were otherwise absent.
 
-## Image
+## Images
 <p align="center">
   <img width="800" alt="image" src="https://github.com/vqiu25/ray-tracer/assets/109129209/52b5070d-11c5-4640-a8b5-24b35e76759f">
 </p>
