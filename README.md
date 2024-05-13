@@ -9,7 +9,7 @@ A simplistic ray tracing engine, built with the guidance of Peter Shirley's "Ray
 
 ## Image
 <p align="center">
-  <img width="750" alt="image" src="https://github.com/vqiu25/ray-tracer/assets/109129209/8a800403-f803-456b-81f2-a4275c895bfb">
+  <img width="800" alt="image" src="https://github.com/vqiu25/ray-tracer/assets/109129209/52b5070d-11c5-4640-a8b5-24b35e76759f">
 </p>
 
 ## Compilation
