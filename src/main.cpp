@@ -4,7 +4,10 @@
 #include "vec3.h"
 #include <chrono>
 #include <iostream>
+#include <mutex>
 #include <thread>
+
+std::mutex sdlMutex;
 
 void renderSegment(int startY, int endY, int imageWidth, int imageHeight,
                    const vec3& lowerLeftCorner, const vec3& horizontal,
@@ -20,8 +23,13 @@ void renderSegment(int startY, int endY, int imageWidth, int imageHeight,
       int ig = int(255.999 * col.y());
       int ib = int(255.999 * col.z());
 
-      sdltemplate::setDrawColor(sdltemplate::createColor(ir, ig, ib, 255));
-      sdltemplate::drawPoint(i, imageHeight - j);
+      // Synchronise access to SDL drawing functions to prevent race conditions,
+      // thus allowing only 1 thread to draw at a time
+      {
+        std::lock_guard<std::mutex> guard(sdlMutex);
+        sdltemplate::setDrawColor(sdltemplate::createColor(ir, ig, ib, 255));
+        sdltemplate::drawPoint(i, imageHeight - j - 1);
+      }
     }
   }
 }
